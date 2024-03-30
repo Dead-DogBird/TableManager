@@ -8,8 +8,8 @@ public class LocalDbTest : MonoBehaviour
 {
     private void Start()
     {
-        var itemDataRow = LocalDb.Get<ItemDataRow>("test");
-        Debug.Log($"{itemDataRow.id} {itemDataRow.price} {itemDataRow.currencyType}");
+        var itemDataRow = LocalDb.Get<excelsRow>("0");
+        Debug.Log($"{itemDataRow.id} {itemDataRow.name}");
 
         foreach (var testDataRow in LocalDb.GetEnumerable<TestDataRow>())
         {

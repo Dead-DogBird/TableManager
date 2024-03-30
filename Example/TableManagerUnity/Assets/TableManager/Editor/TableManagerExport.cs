@@ -3,9 +3,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 
 namespace TableManager
@@ -13,8 +15,9 @@ namespace TableManager
     public static class TableManagerExport
     {
         [MenuItem("TableManager/Export %F8")]
-        public static void Export()
+        async public static void Export()
         {
+            await GetSpreadsheets();
             Debug.Log($"[{nameof(TableManager)}] Export Start");
             var result = ExportExcelToJson();
 
@@ -55,7 +58,7 @@ namespace TableManager
             process.WaitForExit();
             return process.ExitCode;
         }
-
+        
         private static void CreateClassFiles()
         {
             var directoryInfo = new DirectoryInfo(TableManagerConfig.JsonDataPath);
@@ -90,6 +93,22 @@ namespace TableManager
                     template
                         .Replace("#", $"{fileName}Row")
                         .Replace("@", stringBuilder.ToString()));
+            }
+        }
+        async private static UniTask GetSpreadsheets()
+        {
+            string Adrress =
+                "https://docs.google.com/spreadsheets/d/1C9GZLRjcgzIufGgJNvTVSX4SiHkrC4ztCStFnSZu4Gw/export?format=xlsx&gid=0";
+            UnityWebRequest www = UnityWebRequest.Get(Adrress);
+            await www.SendWebRequest();
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                byte[] fileBytes = www.downloadHandler.data;
+                File.WriteAllBytes(TableManagerConfig.ExcelDataPath+"/excels.xlsx",fileBytes);
+            }
+            else
+            {
+                Debug.LogError("파일 받아오기 실패! 허접련ㅋㅋ");
             }
         }
     }
